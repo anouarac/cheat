@@ -1,8 +1,11 @@
+from constants import CARD_TYPES, MAX_CARD_VALUE
 from card import Card
 
 class Hand:
-    def __init__(self, cards=[]):
+    def __init__(self, cards=None):
         self.cards = cards
+        if not cards:
+            self.cards = []
 
     def add(self, card):
         self.cards.append(card)
@@ -19,12 +22,12 @@ class Hand:
             self.delete(card)
     
     def clear_sets(self):
-        counter = [0 for i in range(14)]
+        counter = [0 for i in range(MAX_CARD_VALUE)]
         for card in self.cards:
             counter[card.value] += 1
-        for i in range(1, 14):
+        for i in range(1, MAX_CARD_VALUE):
             if counter[i] == 4:
-                for c in ["S","H","D","C"]:
+                for c in CARD_TYPES:
                     self.delete(Card(c,i))
 
     def size(self):
@@ -32,6 +35,9 @@ class Hand:
 
     def empty(self):
         return not self.cards
+    
+    def clear(self):
+        self.cards = []
 
     def __str__(self):
         return "[ " + ", ".join([str(card) for card in self.cards]) + " ]"
