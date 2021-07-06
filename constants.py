@@ -1,7 +1,7 @@
 MAX_CARD_VALUE = 14
 CARD_TYPES = ["S","H","D","C"]
 MP = {
-    0 : "None",
+    0 : None,
     1 : "1",
     2 : "2",
     3 : "3",
