@@ -1,2 +1,2 @@
-# cheat
+# Cheat
 The cheat card game
