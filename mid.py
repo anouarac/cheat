@@ -1,7 +1,8 @@
 from hand import Hand
+from constants import *
 
 class Mid:
-    def __init__(self, value=0, hand=None, last_play=-1):
+    def __init__(self, value=0, hand=None, last_play=None):
         self.current_value = value
         self.hand = hand
         if not hand:
@@ -29,6 +30,6 @@ class Mid:
     
     def __str__(self):
         output = str(self.hand)
-        output += ", curv = " + str(self.current_value)
+        output += ", curv = " + MP[self.current_value]
         output += ", last_play = " + str(self.last_play)
         return output

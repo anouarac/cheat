@@ -7,6 +7,12 @@ class Hand:
         if not cards:
             self.cards = []
 
+    def has(self, value):
+        for card in self.cards:
+            if card.value == value:
+                return True
+        return False
+
     def add(self, card):
         self.cards.append(card)
 
@@ -19,7 +25,11 @@ class Hand:
 
     def delete_cards(self, cards):
         for card in cards:
+            if not card in self.cards:
+                return False
+        for card in cards:
             self.delete(card)
+        return True
     
     def clear_sets(self):
         counter = [0 for i in range(MAX_CARD_VALUE)]
@@ -29,6 +39,13 @@ class Hand:
             if counter[i] == 4:
                 for c in CARD_TYPES:
                     self.delete(Card(c,i))
+    
+    def arrange(self):
+        self.cards.sort()
+        self.clear_sets()
+    
+    def sort(self):
+        self.cards.sort()
 
     def size(self):
         return len(self.cards)

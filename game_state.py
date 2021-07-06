@@ -1,12 +1,14 @@
 from mid import Mid
 from hand import Hand
+from constants import *
 
 class State:
-    def __init__(self, nbr_players, hands=[], mid=None, turn=0, prev_player=-1):
+    def __init__(self, nbr_players, hands=[], mid=None, turn=0, prev_player=None):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
         self.prev_player = prev_player
+        self.ended = False
         if not hands:
             self.hands = [Hand() for i in range(nbr_players)]
         if not mid:
@@ -14,8 +16,10 @@ class State:
         self.turn = turn
         for i in range(nbr_players):
             self.hands[i].clear_sets()
+            self.hands[i].sort()
 
     def end_game(self):
+        self.ended = True
         print("Player " + str(self.turn) + " lost.")
 
     def next_turn(self):
@@ -34,24 +38,37 @@ class State:
 
     def play(self, cards, call):
         if self.mid.current_value != call and not self.mid.empty():
-            return -1
+            return False
         self.mid.current_value = call
         self.mid.add_cards(cards)
-        self.hands[self.turn].delete_cards(cards)
+        if not self.hands[self.turn].delete_cards(cards):
+            return False
         self.next_turn()
-        return 0
+        if self.ended:
+            return True
+        
+        output = "Player " + str(self.turn) + " called " + str(len(cards)) + " card"
+        if len(cards) > 1:
+            output += "s"
+        output += " of value " + MP[call]
+        print(output)
+
+        return True
 
     def call_bs(self):
-        if self.mid.match():
+        print("Player " + str(self.turn) + " called BS on player " + str(self.prev_player))
+        if self.mid.empty() or self.mid.match():
+            print("It was not a lie")
             self.hands[self.turn].add_cards(self.mid.hand.cards)
+            self.hands[self.turn].arrange()
             self.mid.show()
             self.mid.hand.clear()
-            self.hands[self.turn].clear_sets()
             self.next_turn()
             return False
         else:
+            print("It was a lie")
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
-            self.hands[self.prev_player].clear_sets()
+            self.hands[self.prev_player].arrange()
             self.mid.show()
             self.mid.hand.clear()
             return True
