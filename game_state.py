@@ -11,6 +11,8 @@ class State:
         if not mid:
             self.mid = Mid()
         self.turn = turn
+        for i in range(nbr_players):
+            self.hands[i].clear_sets()
 
     def next_turn(self):
         self.turn = (self.turn + 1) % self.nbr_players
@@ -29,11 +31,13 @@ class State:
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.mid.show()
             self.mid.hand.cards = []
+            self.hands[self.turn].clear_sets()
             self.next_turn()
             return False
         else:
             prev_player = (self.turn - 1) % self.nbr_players
             self.hands[prev_player].add_cards(self.mid.hand.cards)
+            self.hands[prev_player].clear_sets()
             self.mid.show()
             self.mid.hand.cards = []
             return True

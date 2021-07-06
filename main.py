@@ -10,6 +10,7 @@ c5 = Card("S", 7)
 c6 = Card("H", 7)
 state = State(2,[Hand([c1,c3,c4,c5,c6]),Hand([c2])])
 
+print(state.hands[0])
 state.hands[0].clear_sets()
 state.play([c1],3)
 
