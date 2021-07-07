@@ -15,13 +15,9 @@ for i in range(len(deck)):
 state = State(nbr_players,hands)
 print(state)
 
-user, c1, c2, c3 = Brain(1), Brain(1), Brain(1), Brain(1)
+brains = [Brain() for i in range(nbr_players)]
+brains[1].set_type(2)
+brains[0].set_type(2)
 
 while not state.ended:
-    if state.turn == 0:
-        user.response(state)
-    elif state.turn == 1:
-        c1.response(state)
-    elif state.turn == 2:
-        c2.response(state)
-    else: c3.response(state)
+    brains[state.turn].response(state)

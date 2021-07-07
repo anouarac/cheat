@@ -13,6 +13,14 @@ class Hand:
                 return True
         return False
 
+    def cards_of_value(self, value):
+        available = Hand()
+        for t in CARD_TYPES:
+            card = Card(t, value)
+            if card in self.cards:
+                available.add(card)
+        return available
+
     def add(self, card):
         self.cards.append(card)
 

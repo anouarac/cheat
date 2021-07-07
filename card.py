@@ -1,7 +1,7 @@
 from constants import *
 class Card:
-    def __init__(self, _type, value):
-        self.type = _type
+    def __init__(self, type, value):
+        self.type = type
         self.value = value
 
     def __str__(self):

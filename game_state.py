@@ -43,16 +43,12 @@ class State:
         self.mid.add_cards(cards)
         if not self.hands[self.turn].delete_cards(cards):
             return False
-        self.next_turn()
-        if self.ended:
-            return True
-        
         output = "Player " + str(self.turn) + " called " + str(len(cards)) + " card"
         if len(cards) > 1:
             output += "s"
         output += " of value " + MP[call]
         print(output)
-
+        self.next_turn()
         return True
 
     def call_bs(self):
