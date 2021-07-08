@@ -1,5 +1,5 @@
 MAX_CARD_VALUE = 14
-CARD_TYPES = ["S","H","D","C"]
+CARD_SUITS = ["C","D","H","S"]
 MP = {
     0 : "None",
     1 : "1",

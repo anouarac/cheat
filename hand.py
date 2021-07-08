@@ -1,4 +1,4 @@
-from constants import CARD_TYPES, MAX_CARD_VALUE
+from constants import *
 from card import Card
 
 class Hand:
@@ -13,9 +13,10 @@ class Hand:
                 return True
         return False
 
+    # Returns the subset of cards of a certain value from hand
     def cards_of_value(self, value):
         available = Hand()
-        for t in CARD_TYPES:
+        for t in CARD_SUITS:
             card = Card(t, value)
             if card in self.cards:
                 available.add(card)
@@ -45,7 +46,7 @@ class Hand:
             counter[card.value] += 1
         for i in range(1, MAX_CARD_VALUE):
             if counter[i] == 4:
-                for c in CARD_TYPES:
+                for c in CARD_SUITS:
                     self.delete(Card(c,i))
     
     def arrange(self):

@@ -26,10 +26,10 @@ class Brain:
             state.call_bs()
         else:
             while True:
-                strings = list(input("Select your cards: (e.g. D1 C3 S12) ").split(" "))
+                strings = list(input("Select your cards: (e.g. 1D 3C KS) ").split(" "))
                 selected_cards = Hand()
                 for s in strings:
-                    card = Card(s[0], revMP[s[1:]])
+                    card = Card(s[-1], revMP[s[:-1]])
                     selected_cards.add(card)
                 call = input("Call: ")
                 if state.play(selected_cards.cards, revMP[call]):
@@ -38,6 +38,9 @@ class Brain:
 
     # 1 Never lies
     def honest(self, state):
+        if state.nbr_players_with_cards_left() == 1:
+            state.call_bs()
+            return
         player = state.turn
 
         if state.mid.empty():
@@ -57,6 +60,9 @@ class Brain:
     # 2 Calls BS with probability self.p if mid is empty,
     # or plays randomly (uniformly distributed decisions where a decision is a pair (cards, call)) 
     def random(self, state):
+        if state.nbr_players_with_cards_left() == 1:
+            state.call_bs()
+            return
         player = state.turn
         mini = 1
         call_bs = (np.random.binomial(1, self.p, 1) == [1])
@@ -67,7 +73,7 @@ class Brain:
         to_choose = list(range(0, state.hands[player].size()))
         shuffle(to_choose)
         cards = [state.hands[player].cards[to_choose[i]] for i in range(nbr_cards_played)]
-        call = randint(1,13)
+        call = state.hands[player].cards[randint(0, state.hands[player].size()-1)].value
         if not state.mid.empty():
             call = state.mid.current_value
         state.play(cards, call)
@@ -76,9 +82,15 @@ class Brain:
     def call_lie(self, state):
         player = state.turn
         if state.mid.empty():
-            self.response2(state)
+            self.random(state)
         else: state.call_bs()
 
+    # 4 Honest with probability self.p, plays randomly otherwise
+    def moderate(self, state):
+        honest = (np.random.binomial(1, self.p, 1) == [1])
+        if honest:
+            self.honest(state)
+        else: self.random(state)
 
     def response(self, state):
         if self.type == 0:
@@ -89,3 +101,5 @@ class Brain:
             self.random(state)
         elif self.type == 3:
             self.call_lie(state)
+        elif self.type == 4:
+            self.moderate(state)
