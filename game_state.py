@@ -3,7 +3,7 @@ from hand import Hand
 from constants import *
 
 class State:
-    def __init__(self, nbr_players, hands=[], mid=None, turn=0, prev_player=None):
+    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
@@ -59,6 +59,9 @@ class State:
         return True
 
     def call_bs(self):
+        if self.prev_player == None:
+            print("Invalid play")
+            return False
         print("Player " + str(self.turn + 1) + " called BS on player " + str(self.prev_player + 1))
         if self.mid.empty() or self.mid.match():
             print("It was not a lie")

@@ -1,3 +1,4 @@
+import pygame
 MAX_CARD_VALUE = 14
 CARD_SUITS = ["C","D","H","S"]
 MP = {
@@ -20,3 +21,8 @@ MP = {
 revMP = {}
 for i in range(1,14):
     revMP[MP[i]] = i
+
+SIZE = 800, 600
+DARK_RED = (139,0,0)
+
+BACK = pygame.transform.scale(pygame.image.load("./Assets/Cards/back.png"), (100, 160))
