@@ -1,3 +1,4 @@
+from time import sleep
 from hand import Hand
 from constants import *
 
@@ -14,7 +15,10 @@ class Mid:
         self.hand.add_cards(cards)
 
     def show(self):
+        self.hand.set_privacy(True)
         print("Showing middle: " + str(self.hand))
+        sleep(SLEEP_TIME)
+        self.hand.set_privacy(False)
 
     def size(self):
         return self.hand.size()

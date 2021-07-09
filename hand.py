@@ -2,10 +2,14 @@ from constants import *
 from card import Card
 
 class Hand:
-    def __init__(self, cards=None):
+    def __init__(self, cards=None, public=False):
         self.cards = cards
+        self.public = public
         if not cards:
             self.cards = []
+    
+    def set_privacy(self, public):
+        self.public = public
 
     def has(self, value):
         for card in self.cards:
