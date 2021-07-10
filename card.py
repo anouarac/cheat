@@ -1,11 +1,12 @@
 from constants import *
+
 class Card:
-    def __init__(self, _type, value):
-        self.type = _type
+    def __init__(self, suit, value):
+        self.suit = suit
         self.value = value
 
     def __str__(self):
-        return self.type + MP[self.value]
+        return MP[self.value] + self.suit
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -13,6 +14,6 @@ class Card:
     def __lt__(self, other):
         if self.value != other.value:
             return self.value < other.value
-        return self.type < other.type
+        return self.suit < other.suit
 
     #TODO: define getters and setters

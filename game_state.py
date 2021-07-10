@@ -3,7 +3,7 @@ from hand import Hand
 from constants import *
 
 class State:
-    def __init__(self, nbr_players, hands=[], mid=None, turn=0, prev_player=None):
+    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
@@ -20,7 +20,14 @@ class State:
 
     def end_game(self):
         self.ended = True
-        print("Player " + str(self.turn) + " lost.")
+        print("Player " + str(self.turn + 1) + " lost.")
+
+    def nbr_players_with_cards_left(self):
+        cnt = 0
+        for i in range(self.nbr_players):
+            if not self.hands[i].empty():
+                cnt += 1
+        return cnt
 
     def next_turn(self):
         self.prev_player = self.turn
@@ -43,20 +50,19 @@ class State:
         self.mid.add_cards(cards)
         if not self.hands[self.turn].delete_cards(cards):
             return False
-        self.next_turn()
-        if self.ended:
-            return True
-        
-        output = "Player " + str(self.turn) + " called " + str(len(cards)) + " card"
+        output = "Player " + str(self.turn + 1) + " called " + str(len(cards)) + " card"
         if len(cards) > 1:
             output += "s"
         output += " of value " + MP[call]
         print(output)
-
+        self.next_turn()
         return True
 
     def call_bs(self):
-        print("Player " + str(self.turn) + " called BS on player " + str(self.prev_player))
+        if self.prev_player == None:
+            print("Invalid play")
+            return False
+        print("Player " + str(self.turn + 1) + " called BS on player " + str(self.prev_player + 1))
         if self.mid.empty() or self.mid.match():
             print("It was not a lie")
             self.hands[self.turn].add_cards(self.mid.hand.cards)
@@ -76,6 +82,6 @@ class State:
     def __str__(self):
         output = ""
         for i in range(self.nbr_players):
-            output += "Player " + str(i) + ": "+ str(self.hands[i])+"\n"
+            output += "Player " + str(i + 1) + ": "+ str(self.hands[i])+"\n"
         output += "Middle: " + str(self.mid)
         return output
