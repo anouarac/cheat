@@ -65,17 +65,17 @@ class State:
         print("Player " + str(self.turn + 1) + " called BS on player " + str(self.prev_player + 1))
         if self.mid.empty() or self.mid.match():
             print("It was not a lie")
+            self.mid.show()
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.hands[self.turn].arrange()
-            self.mid.show()
             self.mid.hand.clear()
             self.next_turn()
             return False
         else:
             print("It was a lie")
+            self.mid.show()
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
             self.hands[self.prev_player].arrange()
-            self.mid.show()
             self.mid.hand.clear()
             return True
     

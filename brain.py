@@ -10,12 +10,16 @@ class Brain:
     def __init__(self, type=0, probability=0.5):
         self.type = type
         self.p = probability
+        if self.p < 0 or self.p > 1:
+            self.p = 0.5
 
     def set_type(self, type):
         self.type = type
     
     def set_probability(self, p):
         self.p = p
+        if p > 1 or p < 0:
+            self.p = 0.5
 
     # 0 User input
     def user(self, state):

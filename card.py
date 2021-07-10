@@ -4,6 +4,8 @@ class Card:
     def __init__(self, suit, value):
         self.suit = suit
         self.value = value
+        self.selected = False
+        
 
     def __str__(self):
         return MP[self.value] + self.suit
