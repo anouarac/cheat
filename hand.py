@@ -1,17 +1,30 @@
-from constants import CARD_TYPES, MAX_CARD_VALUE
+from constants import *
 from card import Card
 
 class Hand:
-    def __init__(self, cards=None):
+    def __init__(self, cards=None, public=False):
         self.cards = cards
+        self.public = public
         if not cards:
             self.cards = []
+    
+    def set_privacy(self, public):
+        self.public = public
 
     def has(self, value):
         for card in self.cards:
             if card.value == value:
                 return True
         return False
+
+    # Returns the subset of cards of a certain value from hand
+    def cards_of_value(self, value):
+        available = Hand()
+        for t in CARD_SUITS:
+            card = Card(t, value)
+            if card in self.cards:
+                available.add(card)
+        return available
 
     def add(self, card):
         self.cards.append(card)
@@ -37,7 +50,7 @@ class Hand:
             counter[card.value] += 1
         for i in range(1, MAX_CARD_VALUE):
             if counter[i] == 4:
-                for c in CARD_TYPES:
+                for c in CARD_SUITS:
                     self.delete(Card(c,i))
     
     def arrange(self):
