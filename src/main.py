@@ -31,5 +31,4 @@ def play_game():
 t1 = Thread(target = window.update_screen)
 t1.start()
 
-t2 = Thread(target = play_game)
-t2.start()
+play_game()
