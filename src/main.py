@@ -68,9 +68,8 @@ def update_screen():
         container = Rect(x, y, w, h)
         pygame.draw.rect(SCREEN, BLACK, container, BORDER_WIDTH, BORDER_RADIUS)
 
-    SCREEN.blit(BACKGROUND, (0, 0))
-
-    pygame.display.update()
+    pygame.display.set_caption('Cheat')
+    pygame.display.set_icon(ICON)
     while 1:
         click_pos = None
         for event in pygame.event.get():
