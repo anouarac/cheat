@@ -1,17 +1,15 @@
 import numpy as np
 from random import randint, shuffle
 from constants import *
-from game_state import State
+from state import State
 from mid import Mid
 from card import Card
 from hand import Hand
 
-class Brain:
+class Player:
     def __init__(self, type=0, probability=0.5):
-        self.type = type
-        self.p = probability
-        if self.p < 0 or self.p > 1:
-            self.p = 0.5
+        self.set_type(type)
+        self.set_probability(probability)
 
     def set_type(self, type):
         self.type = type

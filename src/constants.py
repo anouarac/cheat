@@ -17,7 +17,7 @@ revMP = {"A" : 1}
 for i in range(1, 14):
     revMP[MP[i]] = i
 
-ASSETS = "../assets/"
+ASSETS_DIR = "../assets/"
 SIZE = WIDTH, HEIGHT = 1024, 660
 DARK_RED = (139,0,0)
 WHITE = (255,255,255)
@@ -26,12 +26,12 @@ YELLOW = (255,255,0)
 CARD_SIZE = INIT_CARD_WIDTH, INIT_CARD_HEIGHT = 69,100
 WIDTH_HEIGHT_RATIO = 500/726
 HORIZONTAL_MARGIN = 30
-BACKGROUND = pygame.image.load(ASSETS + "fabric.jpg")
+BACKGROUND = pygame.image.load(ASSETS_DIR + "fabric.jpg")
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, SIZE)
-ICON = pygame.image.load(ASSETS + "cards/king_of_spades.png")
-BACK = pygame.image.load(ASSETS + "cards/back.png")
+ICON = pygame.image.load(ASSETS_DIR + "cards/king_of_spades.png")
+CARD_BACK = pygame.image.load(ASSETS_DIR + "cards/back.png")
 ARROW_SIZE = ARROW_WIDTH, ARROW_HEIGHT = (25,15)
-ARROW = pygame.transform.scale(pygame.image.load(ASSETS + "arrow.png"), ARROW_SIZE)
+ARROW = pygame.transform.scale(pygame.image.load(ASSETS_DIR + "arrow.png"), ARROW_SIZE)
 ARROW_POS = ARROW_X, ARROW_Y = 4, None
 VOFFSET = 25
 CENTER_MID = 70
@@ -43,4 +43,4 @@ FILE_OF_CARD = {}
 for i in range(1, 14):
     for j in range(4):
         NAME = MP_LONG[i] + "_of_" + CARD_SUITS_LONG[j]
-        FILE_OF_CARD[MP[i] + CARD_SUITS[j]] = pygame.image.load(ASSETS + "cards/" + NAME + ".png")
+        FILE_OF_CARD[MP[i] + CARD_SUITS[j]] = pygame.image.load(ASSETS_DIR + "cards/" + NAME + ".png")
