@@ -1,11 +1,16 @@
 from constants import *
 
 class Card:
-    def __init__(self, suit, value):
+    def __init__(self, suit, value, selected=False):
         self.suit = suit
         self.value = value
+        self.selected = selected
+
+    def select(self):
+        self.selected = True
+    
+    def deselect(self):
         self.selected = False
-        
 
     def __str__(self):
         return MP[self.value] + self.suit
