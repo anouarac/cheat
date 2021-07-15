@@ -3,12 +3,13 @@ from hand import Hand
 from constants import *
 
 class State:
-    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None):
+    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None, text=""):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
         self.prev_player = prev_player
         self.ended = False
+        self.text = text
         if not hands:
             self.hands = [Hand() for i in range(nbr_players)]
         if not mid:
@@ -18,6 +19,9 @@ class State:
             self.hands[i].clear_sets()
             self.hands[i].sort()
 
+    def set_text(self, text):
+        self.text = text
+    
     def end_game(self):
         self.ended = True
         print("Player " + str(self.turn + 1) + " lost.")

@@ -1,17 +1,15 @@
 import numpy as np
 from random import randint, shuffle
 from constants import *
-from game_state import State
+from state import State
 from mid import Mid
 from card import Card
 from hand import Hand
 
-class Brain:
+class Player:
     def __init__(self, type=0, probability=0.5):
-        self.type = type
-        self.p = probability
-        if self.p < 0 or self.p > 1:
-            self.p = 0.5
+        self.set_type(type)
+        self.set_probability(probability)
 
     def set_type(self, type):
         self.type = type
@@ -22,26 +20,21 @@ class Brain:
             self.p = 0.5
 
     # 0 User input
-    def user(self, state):
-        inp = input("Your turn: (BS/play/show) ")
-        if inp == "show":
-            print(state)
-        elif inp == "BS":
+    def play_user(self, state, resp):
+        idrep, cards, call = resp
+        player = state.turn
+        if idrep == 0:
+            print(state.hands[player])
+            return True
+        elif idrep == 1:
             state.call_bs()
+            return True
         else:
-            while True:
-                strings = list(input("Select your cards: (e.g. 1D 3C KS) ").split(" "))
-                selected_cards = Hand()
-                for s in strings:
-                    card = Card(s[-1], revMP[s[:-1]])
-                    selected_cards.add(card)
-                call = input("Call: ")
-                if state.play(selected_cards.cards, revMP[call]):
-                    break
-                print("Invalid play")
+            return state.play(cards, call)
+
 
     # 1 Never lies
-    def honest(self, state):
+    def play_honest(self, state):
         if state.nbr_players_with_cards_left() == 1:
             state.call_bs()
             return
@@ -63,7 +56,7 @@ class Brain:
         
     # 2 Calls BS with probability self.p if mid is empty,
     # or plays randomly (uniformly distributed decisions where a decision is a pair (cards, call)) 
-    def random(self, state):
+    def play_random(self, state):
         if state.nbr_players_with_cards_left() == 1:
             state.call_bs()
             return
@@ -83,27 +76,27 @@ class Brain:
         state.play(cards, call)
 
     # 3 Always calls BS or plays randomly if the middle is empty
-    def call_lie(self, state):
+    def play_skeptic(self, state):
         player = state.turn
         if state.mid.empty():
-            self.random(state)
+            self.play_random(state)
         else: state.call_bs()
 
     # 4 Honest with probability self.p, plays randomly otherwise
-    def moderate(self, state):
+    def play_moderate(self, state):
         honest = (np.random.binomial(1, self.p, 1) == [1])
         if honest:
-            self.honest(state)
-        else: self.random(state)
+            self.play_honest(state)
+        else: self.play_random(state)
 
-    def response(self, state):
+    def response(self, state, resp=None):
         if self.type == 0:
-            self.user(state)
+            self.play_user(state, resp)
         elif self.type == 1:
-            self.honest(state)
+            self.play_honest(state)
         elif self.type == 2:
-            self.random(state)
+            self.play_random(state)
         elif self.type == 3:
-            self.call_lie(state)
+            self.play_skeptic(state)
         elif self.type == 4:
-            self.moderate(state)
+            self.play_moderate(state)
