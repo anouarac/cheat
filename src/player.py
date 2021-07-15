@@ -91,7 +91,7 @@ class Player:
 
     def response(self, state, resp=None):
         if self.type == 0:
-            self.play_user(state, resp)
+            return self.play_user(state, resp)
         elif self.type == 1:
             self.play_honest(state)
         elif self.type == 2:
@@ -100,3 +100,4 @@ class Player:
             self.play_skeptic(state)
         elif self.type == 4:
             self.play_moderate(state)
+        return True
