@@ -30,7 +30,7 @@ class Window:
             font = pygame.font.SysFont("profont", 24)
             color = WHITE
             if selected:
-                color = GRAY
+                color = BLACK
             text_render = font.render(text, 1, color)
             x, y, w , h = text_render.get_rect()
             x, y = position
@@ -156,7 +156,10 @@ class Window:
                     elif self.is_human and bs_button.collidepoint(click_pos):
                         self.clicked_bs = True
                         state.played = True
-                    for i in range(len(call_buttons)):
+                    sz = 0
+                    if call_buttons != None:
+                        sz = len(call_buttons)
+                    for i in range(sz):
                         butt = call_buttons[i]
                         if butt.collidepoint(click_pos):
                             state.call = i + 1

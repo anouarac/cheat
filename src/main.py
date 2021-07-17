@@ -66,6 +66,9 @@ def play_game():
         state.played = False
         window.is_human = False
         state.call = None
+        for card in state.cur_selected.cards:
+            card.selected = False
+        state.cur_selected = Hand()
         time.sleep(SLEEP_TIME)
 
 

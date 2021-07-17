@@ -3,7 +3,7 @@ from hand import Hand
 from constants import *
 
 class State:
-    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None, text="Cheat", cur_selected=None, played=False, call=1):
+    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None, text="Cheat", cur_selected=None, played=False, call=0):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
@@ -58,6 +58,8 @@ class State:
     def play(self, cards, call):
         if self.mid.current_value != call and not self.mid.empty():
             return False
+        if not call in range(1, MAX_CARD_VALUE):
+            return False
         if not self.hands[self.turn].delete_cards(cards) or not cards:
             return False
         self.mid.current_value = call
@@ -83,6 +85,7 @@ class State:
             self.mid.hand.clear()
             self.next_turn()
             self.mid.current_value = None
+            self.mid.last_play = None
             return False
         else:
             self.text = "It was a lie"
@@ -91,6 +94,7 @@ class State:
             self.hands[self.prev_player].arrange()
             self.mid.hand.clear()
             self.mid.current_value = None
+            self.mid.last_play = None
             return True
     
     def __str__(self):
