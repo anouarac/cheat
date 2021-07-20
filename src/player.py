@@ -35,6 +35,9 @@ class Player:
 
     # 1 Never lies
     def play_honest(self, state):
+        if state.mid.last_play != None and state.mid.last_play > 3:
+            state.call_bs()
+            return
         if state.nbr_players_with_cards_left() == 1:
             state.call_bs()
             return
@@ -57,6 +60,9 @@ class Player:
     # 2 Calls BS with probability self.p if mid is empty,
     # or plays randomly (uniformly distributed decisions where a decision is a pair (cards, call)) 
     def play_random(self, state):
+        if state.mid.last_play != None and state.mid.last_play > 3:
+            state.call_bs()
+            return
         if state.nbr_players_with_cards_left() == 1:
             state.call_bs()
             return
@@ -84,6 +90,9 @@ class Player:
 
     # 4 Honest with probability self.p, plays randomly otherwise
     def play_moderate(self, state):
+        if state.mid.last_play != None and state.mid.last_play > 3:
+            state.call_bs()
+            return
         honest = (np.random.binomial(1, self.p, 1) == [1])
         if honest:
             self.play_honest(state)
@@ -91,7 +100,7 @@ class Player:
 
     def response(self, state, resp=None):
         if self.type == 0:
-            self.play_user(state, resp)
+            return self.play_user(state, resp)
         elif self.type == 1:
             self.play_honest(state)
         elif self.type == 2:
@@ -100,3 +109,4 @@ class Player:
             self.play_skeptic(state)
         elif self.type == 4:
             self.play_moderate(state)
+        return True

@@ -1,9 +1,12 @@
 import pygame
+import sys
+pygame.init()
 SLEEP_TIME = 2 # seconds
 MAX_CARD_VALUE = 14
 CARD_SUITS = ["C","D","H","S"]
 CARD_SUITS_LONG = ["clubs", "diamonds", "hearts", "spades"]
 MP = {
+    None : "None",
     0 : "None", 1 : "1", 2 : "2", 3 : "3", 4 : "4", 5 : "5", 6 : "6", 
     7 : "7", 8 : "8", 9 : "9", 10 : "10", 11 : "J", 12 : "Q", 13 : "K"
 }
@@ -22,6 +25,7 @@ SIZE = WIDTH, HEIGHT = 1024, 660
 DARK_RED = (139,0,0)
 WHITE = (255,255,255)
 BLACK = (0,0,0)
+GRAY = (200,200,200)
 YELLOW = (255,255,0)
 CARD_SIZE = INIT_CARD_WIDTH, INIT_CARD_HEIGHT = 69,100
 WIDTH_HEIGHT_RATIO = 500/726
@@ -38,6 +42,7 @@ CENTER_MID = 70
 click_pos = None
 BORDER_WIDTH = 3
 BORDER_RADIUS = 3
+SMALLFONT = pygame.font.SysFont('timesnewroman', 35)
 
 FILE_OF_CARD = {}
 for i in range(1, 14):

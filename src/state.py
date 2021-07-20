@@ -3,13 +3,18 @@ from hand import Hand
 from constants import *
 
 class State:
-    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None, text=""):
+    def __init__(self, nbr_players=6, hands=[], mid=None, turn=0, prev_player=None, text="Cheat", cur_selected=None, played=False, call=0):
         self.nbr_players = nbr_players
         self.hands = hands
         self.mid = mid
         self.prev_player = prev_player
         self.ended = False
         self.text = text
+        self.cur_selected = cur_selected
+        self.played = played
+        self.call = call
+        if not cur_selected:
+            self.cur_selected = Hand()
         if not hands:
             self.hands = [Hand() for i in range(nbr_players)]
         if not mid:
@@ -24,7 +29,7 @@ class State:
     
     def end_game(self):
         self.ended = True
-        print("Player " + str(self.turn + 1) + " lost.")
+        self.text = "Player " + str(self.turn + 1) + " lost."
 
     def nbr_players_with_cards_left(self):
         cnt = 0
@@ -35,6 +40,9 @@ class State:
 
     def next_turn(self):
         self.prev_player = self.turn
+        for card in self.cur_selected.cards:
+            card.selected = False
+        self.cur_selected = Hand()
         self.turn = (self.turn + 1) % self.nbr_players
         cnt = 0
         while self.hands[self.turn].empty() and cnt <= 6:
@@ -50,37 +58,43 @@ class State:
     def play(self, cards, call):
         if self.mid.current_value != call and not self.mid.empty():
             return False
+        if not call in range(1, MAX_CARD_VALUE):
+            return False
+        if not self.hands[self.turn].delete_cards(cards) or not cards:
+            return False
         self.mid.current_value = call
         self.mid.add_cards(cards)
-        if not self.hands[self.turn].delete_cards(cards):
-            return False
         output = "Player " + str(self.turn + 1) + " called " + str(len(cards)) + " card"
         if len(cards) > 1:
             output += "s"
         output += " of value " + MP[call]
-        print(output)
+        self.text = output
         self.next_turn()
         return True
 
     def call_bs(self):
-        if self.prev_player == None:
-            print("Invalid play")
+        if self.prev_player == None or self.mid.empty():
+            self.text = "Invalid play"
             return False
-        print("Player " + str(self.turn + 1) + " called BS on player " + str(self.prev_player + 1))
+        self.text = "Player " + str(self.turn + 1) + " called BS on player " + str(self.prev_player + 1)
         if self.mid.empty() or self.mid.match():
-            print("It was not a lie")
+            self.text = "It was not a lie"
             self.mid.show()
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.hands[self.turn].arrange()
             self.mid.hand.clear()
             self.next_turn()
+            self.mid.current_value = None
+            self.mid.last_play = None
             return False
         else:
-            print("It was a lie")
+            self.text = "It was a lie"
             self.mid.show()
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
             self.hands[self.prev_player].arrange()
             self.mid.hand.clear()
+            self.mid.current_value = None
+            self.mid.last_play = None
             return True
     
     def __str__(self):
