@@ -10,13 +10,16 @@ class Mid:
             self.hand = Hand()
         self.last_play = last_play
 
+    def value(self):
+        return self.current_value
+
     def add_cards(self, cards):
         self.last_play = len(cards)
         self.hand.add_cards(cards)
 
     def show(self):
         self.hand.set_privacy(True)
-        print("Showing middle: " + str(self.hand))
+        # print("Showing middle: " + str(self.hand))
         sleep(SLEEP_TIME)
         self.hand.set_privacy(False)
 

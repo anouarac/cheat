@@ -1,7 +1,7 @@
 import pygame
 import sys
 pygame.init()
-SLEEP_TIME = 2 # seconds
+SLEEP_TIME = 0.01 # seconds
 MAX_CARD_VALUE = 14
 CARD_SUITS = ["C","D","H","S"]
 CARD_SUITS_LONG = ["clubs", "diamonds", "hearts", "spades"]
