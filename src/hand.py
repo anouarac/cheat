@@ -25,6 +25,10 @@ class Hand:
             if card in self.cards:
                 available.add(card)
         return available
+    
+    def cnt_value(self, value):
+        cards = self.cards_of_value(value)
+        return cards.size()
 
     def add(self, card):
         self.cards.append(card)
@@ -71,3 +75,11 @@ class Hand:
 
     def __str__(self):
         return "[ " + ", ".join([str(card) for card in self.cards]) + " ]"
+    
+    def __hash__(self):
+        deck = [Card(c,nb) for nb in range(1, MAX_CARD_VALUE) for c in CARD_SUITS]
+        deck.sort()
+        h = 0
+        for card in self.cards:
+            h |= (1 << deck.index(card))
+        return h

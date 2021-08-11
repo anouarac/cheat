@@ -47,12 +47,12 @@ class Player:
             value = state.hands[player].cards[randint(0, state.hands[player].size()-1)].value
             available = state.hands[player].cards_of_value(value)
             nbr_called_cards = randint(1, available.size())
-            state.play(available.cards[0:nbr_called_cards], value)
+            state.play(Hand(available.cards[0:nbr_called_cards]), value)
 
         elif state.hands[player].has(state.mid.current_value):
             available = state.hands[player].cards_of_value(state.mid.current_value)
             nbr_called_cards = randint(1, available.size())
-            state.play(available.cards[0:nbr_called_cards], state.mid.current_value)
+            state.play(Hand(available.cards[0:nbr_called_cards]), state.mid.current_value)
 
         else:
             state.call_bs()
@@ -79,11 +79,10 @@ class Player:
         call = state.hands[player].cards[randint(0, state.hands[player].size()-1)].value
         if not state.mid.empty():
             call = state.mid.current_value
-        state.play(cards, call)
+        state.play(Hand(cards), call)
 
     # 3 Always calls BS or plays randomly if the middle is empty
     def play_skeptic(self, state):
-        player = state.turn
         if state.mid.empty():
             self.play_random(state)
         else: state.call_bs()
@@ -109,4 +108,6 @@ class Player:
             self.play_skeptic(state)
         elif self.type == 4:
             self.play_moderate(state)
+        elif self.type == 5: # Q-agent
+            return self.play_user(state, resp)
         return True
