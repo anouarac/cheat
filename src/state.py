@@ -52,7 +52,7 @@ class State:
         self.turn = (self.turn + 1) % self.nbr_players
         cnt = 0
         while self.hands[self.turn].empty() and cnt <= 6:
-            if isinstance(self.events[self.turn][-1], str):
+            if isinstance(self.events[self.turn][-1], str) or self.events[self.turn][-1] < 0.3:
                 self.events[self.turn].append(1-self.out/10)
                 self.out += 1
             self.turn = (self.turn + 1) % self.nbr_players
@@ -78,11 +78,16 @@ class State:
         if not self.hands[self.turn].delete_cards(cards.cards) or not cards:
             self.events[self.turn].append(-1)
             return False
+        was_a_lie = not self.mid.empty() and not self.mid.match()
         self.mid.current_value = call
         self.mid.add_cards(cards.cards)
         cnt_call = cards.cnt_value(call)
         # self.events[self.turn].append([qparam, '_2_' + str(call) + '_' + str(hash(cards)), [2, call, cards.cards]])
         self.events[self.turn].append([qparams, '_2_' + str(cnt_call), [2, cnt_call]])
+        if was_a_lie:
+            self.events[self.turn].append(-0.01)
+            self.events[self.prev_player].append(0.01)
+        else: self.events[self.turn].append(0.005)
         output = "Player " + str(self.turn + 1) + " called " + str(cards.size()) + " card"
         if cards.size() > 1:
             output += "s"
@@ -102,6 +107,7 @@ class State:
         if self.mid.empty() or self.mid.match():
             self.text = "It was not a lie"
             self.events[self.turn].append(-0.01)
+            self.events[self.prev_player].append(-0.005)
             self.mid.show()
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.hands[self.turn].arrange()
@@ -113,6 +119,7 @@ class State:
         else:
             self.text = "It was a lie"
             self.events[self.turn].append(0.01)
+            self.events[self.prev_player].append(-0.01)
             self.mid.show()
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
             self.hands[self.prev_player].arrange()
@@ -143,7 +150,6 @@ class State:
     
     def qagentparamssmall(self):
         ret = []
-        ret.append(self.nbr_players)
         ret.append(self.nbr_players_with_cards_left())
         ret.append(self.mid.size())
         ret.append(self.mid.last_play)

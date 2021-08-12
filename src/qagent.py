@@ -10,15 +10,12 @@ from hand import Hand
 
 LR = 0.1
 gamma = 0.5
-data = {}
-score = {}
-occ = {}
-best_score = {}
-best_move = {}
-data["score"] = {}
-data["occ"] = {}
-data["best_score"] = {}
-data["best_move"] = {}
+cur_nb_players = -1
+data = [{} for i in range(7)]
+score = [{} for i in range(7)]
+occ = [{} for i in range(7)]
+best_score = [{} for i in range(7)]
+best_move = [{} for i in range(7)]
 
 def qinit():
     if os.path.isfile('../data/qagent.json'):
@@ -92,20 +89,23 @@ def qsavef():
 
 # less parameters
 
-def qinits():
-    if os.path.isfile('../data/qagents.json'):
-        with open('../data/qagents.json') as json_file:
-            data = json.load(json_file)
-        score = data["score"]
-        occ = data["occ"]
-        best_score = data["best_score"]
-        best_move = data["best_move"]
+def qinits(nb_players):
+    cur_nb_players = nb_players
+    for i in range(7):
+        if os.path.isfile('../data/qagents_' + str(i) + '.json'):
+            with open('../data/qagents_' + str(i) + '.json') as json_file:
+                data[i] = json.load(json_file)
+            score[i] = data[i]["score"]
+            occ[i] = data[i]["occ"]
+            best_score[i] = data[i]["best_score"]
+            best_move[i] = data[i]["best_move"]
 
 def qget_moves(state):
+    cur_nb_players = state.nbr_players_with_cards_left()
     epsilon = 1
     h = state.qagentparamssmall()
-    if h in occ:
-        epsilon = 0.999**occ[h]
+    if h in occ[cur_nb_players]:
+        epsilon = 0.999**occ[cur_nb_players][h]
     a = uniform(0, 1)
     if a <= epsilon:
         idrep, cards, call = None, None, None
@@ -126,7 +126,7 @@ def qget_moves(state):
         idrep = 2
         return idrep, cards, call
     else:
-        [idrep, nb_cards] = best_move[h]
+        [idrep, nb_cards] = best_move[cur_nb_players][h]
         if idrep == 1:
             return idrep, None, None
         cur = state.mid.value()
@@ -138,6 +138,8 @@ def qget_moves(state):
                 if available.cnt_value(value) == nb_cards-k:
                     av = available.cards_of_value(value)
                     cards = Hand([c for c in av.cards][:nb_cards-k])
+                    if value != cur:
+                        value = cur
                     return idrep, cards, value
         available = state.hands[state.turn]
         nb_cards = max(nb_cards, 1)
@@ -146,10 +148,13 @@ def qget_moves(state):
                 if available.cnt_value(value) >= nb_cards-k:
                     av = available.cards_of_value(value)
                     cards = Hand([c for c in av.cards][:nb_cards-k])
+                    if value != cur:
+                        value = cur
                     return idrep, cards, value
 
 def qsaves(events):
     events.reverse()
+    global cur_nb_players
     q = 0
     for a in events:
         if not isinstance(a, list):
@@ -158,21 +163,23 @@ def qsaves(events):
             cur = a[0]
             trans = a[1]
             x = cur + trans
-            if cur in occ:
-                occ[cur] += 1
-            else: occ[cur] = 1
-            if not x in score:
-                score[x] = 0
-            score[x] += LR * (q - score[x])
+            cur_nb_players = int(a[0][0])
+            if cur in occ[cur_nb_players]:
+                occ[cur_nb_players][cur] += 1
+            else: occ[cur_nb_players][cur] = 1
+            if not x in score[cur_nb_players]:
+                score[cur_nb_players][x] = 0
+            score[cur_nb_players][x] += LR * (q - score[cur_nb_players][x])
             q *= gamma
-            if not cur in best_score or score[x] > best_score[cur]:
-                best_score[cur] = score[x]
-                best_move[cur] = a[2]
-    data["score"] = score
-    data["occ"] = occ
-    data["best_score"] = best_score
-    data["best_move"] = best_move
-
+            if not cur in best_score[cur_nb_players] or score[cur_nb_players][x] > best_score[cur_nb_players][cur]:
+                best_score[cur_nb_players][cur] = score[cur_nb_players][x]
+                best_move[cur_nb_players][cur] = a[2]
+    
 def qsavefs():
-    with open('../data/qagents.json', 'w') as outfile:
-        json.dump(data, outfile, indent=4)
+    for i in range(7):
+        data[i]["score"] = score[i]
+        data[i]["occ"] = occ[i]
+        data[i]["best_score"] = best_score[i]
+        data[i]["best_move"] = best_move[i]
+        with open('../data/qagents_' + str(i) + '.json', 'w') as outfile:
+            json.dump(data[i], outfile, indent=4)

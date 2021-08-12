@@ -9,20 +9,18 @@ TRAIN_MODE = input("Train mode: (y/n) ")[0] == "y"
 iterations,cur = 1,1
 if TRAIN_MODE:
     iterations = int(input("Number of games: "))
+nbr_players = int(input("Number of players: "))
+
 while cur <= iterations:
     if cur%10 == 0 or cur == 1:
         print("Game number " + str(cur))
     cur += 1
-    qinits()
     deck = [Card(c,nb) for nb in range(1,MAX_CARD_VALUE) for c in CARD_SUITS]
     random.shuffle(deck)
-    nbr_players = randint(2,6)
-    if not TRAIN_MODE:
-        nbr_players = int(input("Number of players: "))
     hands = [Hand() for i in range(nbr_players)]
     for i in range(len(deck)):
         hands[i%nbr_players].add(deck[i])
-
+    qinits(nbr_players)
     state = State(nbr_players,hands)
     window = Window(state)
     players = [Player(random.randint(5, 5)) for i in range(nbr_players)]
@@ -100,5 +98,5 @@ while cur <= iterations:
         t1.start()
 
     play_game()
-    if cur % 50 == 0:
+    if cur%50 == 0:
         qsavefs()
