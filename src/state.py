@@ -52,7 +52,7 @@ class State:
         self.turn = (self.turn + 1) % self.nbr_players
         cnt = 0
         while self.hands[self.turn].empty() and cnt <= 6:
-            if isinstance(self.events[self.turn][-1], str) or self.events[self.turn][-1] < 0.3:
+            if isinstance(self.events[self.turn][-1], list) or self.events[self.turn][-1] < 0.3:
                 self.events[self.turn].append(1-self.out/10)
                 self.out += 1
             self.turn = (self.turn + 1) % self.nbr_players
@@ -86,9 +86,8 @@ class State:
         self.events[self.turn].append([qparams, '_2_' + str(cnt_call), [2, cnt_call]])
         if was_a_lie:
             self.events[self.turn].append(-0.01)
-            self.events[self.prev_player].append(0.01)
-        else: self.events[self.turn].append(0.005)
-        output = "Player " + str(self.turn + 1) + " called " + str(cards.size()) + " card"
+            self.events[self.prev_player].append(0.005)
+        output = "Player " + str(self.turn+ 1) + " called " + str(cards.size()) + " card"
         if cards.size() > 1:
             output += "s"
         output += " of value " + MP[call]
@@ -106,8 +105,8 @@ class State:
         self.events[self.turn].append([self.qagentparamssmall(), '_1', [1, None]])
         if self.mid.empty() or self.mid.match():
             self.text = "It was not a lie"
-            self.events[self.turn].append(-0.01)
-            self.events[self.prev_player].append(-0.005)
+            self.events[self.turn].append(-0.005*self.mid.size())
+            self.events[self.prev_player].append(0.005)
             self.mid.show()
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.hands[self.turn].arrange()
@@ -118,8 +117,8 @@ class State:
             return False
         else:
             self.text = "It was a lie"
-            self.events[self.turn].append(0.01)
-            self.events[self.prev_player].append(-0.01)
+            self.events[self.turn].append(0.004*self.mid.size())
+            self.events[self.prev_player].append(-0.005*self.mid.size())
             self.mid.show()
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
             self.hands[self.prev_player].arrange()
@@ -156,7 +155,7 @@ class State:
         if self.prev_player:
             ret.append(self.hands[self.prev_player].size())
         else: ret.append(-1)
-        ret.append(self.mid.value != None)
+        ret.append(self.mid.value() != None and self.mid.value() != 0)
         ret.append(self.hands[self.turn].size())
         cnt_call = self.hands[self.turn].cnt_value(self.mid.value())
         ret.append(cnt_call)

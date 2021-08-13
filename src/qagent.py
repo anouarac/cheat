@@ -9,7 +9,7 @@ from card import Card
 from hand import Hand
 
 LR = 0.1
-gamma = 0.5
+gamma = 0.9
 cur_nb_players = -1
 data = [{} for i in range(7)]
 score = [{} for i in range(7)]
@@ -138,7 +138,7 @@ def qget_moves(state):
                 if available.cnt_value(value) == nb_cards-k:
                     av = available.cards_of_value(value)
                     cards = Hand([c for c in av.cards][:nb_cards-k])
-                    if value != cur:
+                    if cur and value != cur:
                         value = cur
                     return idrep, cards, value
         available = state.hands[state.turn]
@@ -148,7 +148,7 @@ def qget_moves(state):
                 if available.cnt_value(value) >= nb_cards-k:
                     av = available.cards_of_value(value)
                     cards = Hand([c for c in av.cards][:nb_cards-k])
-                    if value != cur:
+                    if cur and value != cur:
                         value = cur
                     return idrep, cards, value
 
