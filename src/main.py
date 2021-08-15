@@ -9,8 +9,6 @@ TRAIN_MODE = input("Train mode: (y/n) ")[0] == "y"
 iterations,cur = 1,1
 if TRAIN_MODE:
     iterations = int(input("Number of games: "))
-if not TRAIN_MODE:
-    nbr_players = int(input("Number of players: "))
 
 qinits(6)
 
@@ -31,16 +29,14 @@ while cur <= iterations:
     players = [Player(random.randint(5, 5)) for i in range(nbr_players)]
     if TRAIN_MODE:
         for i in range(nbr_players//2):
-            players[randint(0,nbr_players-1)] = Player(randint(1,4))
+            players[randint(0,nbr_players-1)] = Player(randint(5,5))
     else:
         players[randint(0,nbr_players-1)] = Player(0)
     # players[1].set_type(4)
     # players[0].set_type(0)
     for i in range(nbr_players):
         if players[i].type == 0:
-            state.hands[0].set_privacy(True)
-    for i in range(nbr_players):
-        state.hands[i].set_privacy(True)
+            state.hands[i].set_privacy(True)
 
     def play_game():
         while not state.ended:

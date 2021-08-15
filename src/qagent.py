@@ -8,8 +8,8 @@ from mid import Mid
 from card import Card
 from hand import Hand
 
-LR = 0.1
-gamma = 0.9
+LR = 0.01
+gamma = 0.96
 cur_nb_players = -1
 data = [{} for i in range(7)]
 score = [{} for i in range(7)]
@@ -91,7 +91,7 @@ def qsavef():
 
 def qinits(nb_players):
     cur_nb_players = nb_players
-    for i in range(7):
+    for i in range(1,7):
         if os.path.isfile('../data/qagents_' + str(i) + '.json'):
             with open('../data/qagents_' + str(i) + '.json') as json_file:
                 data[i] = json.load(json_file)
@@ -176,7 +176,7 @@ def qsaves(events):
                 best_move[cur_nb_players][cur] = a[2]
     
 def qsavefs():
-    for i in range(7):
+    for i in range(1,7):
         data[i]["score"] = score[i]
         data[i]["occ"] = occ[i]
         data[i]["best_score"] = best_score[i]

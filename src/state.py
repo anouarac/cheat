@@ -85,8 +85,8 @@ class State:
         # self.events[self.turn].append([qparam, '_2_' + str(call) + '_' + str(hash(cards)), [2, call, cards.cards]])
         self.events[self.turn].append([qparams, '_2_' + str(cnt_call), [2, cnt_call]])
         if was_a_lie:
-            self.events[self.turn].append(-0.01)
-            self.events[self.prev_player].append(0.005)
+            self.events[self.turn].append(-0.0001)
+            self.events[self.prev_player].append(0.0001)
         output = "Player " + str(self.turn+ 1) + " called " + str(cards.size()) + " card"
         if cards.size() > 1:
             output += "s"
@@ -106,7 +106,7 @@ class State:
         if self.mid.empty() or self.mid.match():
             self.text = "It was not a lie"
             self.events[self.turn].append(-0.005*self.mid.size())
-            self.events[self.prev_player].append(0.005)
+            self.events[self.prev_player].append(0.0025*self.mid.size())
             self.mid.show()
             self.hands[self.turn].add_cards(self.mid.hand.cards)
             self.hands[self.turn].arrange()
@@ -117,7 +117,7 @@ class State:
             return False
         else:
             self.text = "It was a lie"
-            self.events[self.turn].append(0.004*self.mid.size())
+            self.events[self.turn].append(0.005*self.mid.size())
             self.events[self.prev_player].append(-0.005*self.mid.size())
             self.mid.show()
             self.hands[self.prev_player].add_cards(self.mid.hand.cards)
