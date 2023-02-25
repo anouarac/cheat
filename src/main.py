@@ -1,7 +1,7 @@
 from graphics import *
 import random
 from qagent import *
-import time
+import time, matplotlib.pyplot
 from threading import Thread
 
 MODE = int(input("Mode: (0: terminal, 1: UI) "))
@@ -94,11 +94,15 @@ while cur <= iterations:
             qsaves(state.events[i])
 
 
+   # t1 = Thread(target = window.update_screen)
+   # if MODE == 1:
+   #     t1.start()
+	
+   # play_game()
+    t1 = Thread(target = play_game)
+    t1.start()
 
-    t1 = Thread(target = window.update_screen)
     if MODE == 1:
-        t1.start()
-
-    play_game()
+        window.update_screen()
     if cur%5000 == 0:
         qsavefs()
