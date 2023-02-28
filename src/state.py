@@ -90,6 +90,8 @@ class State:
         if not call in range(1, MAX_CARD_VALUE):
             self.events[self.turn].append(-1)
             return False
+        if cards.size() == 0:
+            return False
         qparam = self.qagentparams()
         qparams = self.qagentparamssmall()
         if not self.hands[self.turn].delete_cards(cards.cards) or not cards:
@@ -186,7 +188,7 @@ class State:
         ret.append(cnt_call)
         return "_".join([str(elem) for elem in ret])
 
-    def rnnparams(self):
+    def rnnparams(self, public=True):
         ret = []
         ret.append(self.nbr_players)
         ret.append(self.turn)
@@ -199,7 +201,11 @@ class State:
         ret.append(self.call)
         ret.append(self.mid.value())
         ret.append(self.mid.last_play)
-        ret.append(int(hash(self.hands[self.turn])))
+        h = hash(self.hands[self.turn])
+        if public:
+            h = 0
+        for i in range(52):
+            ret.append(((h >> i) & 1))
         for i in range(len(ret)):
             if ret[i] == None:
                 ret[i] = 0

@@ -11,15 +11,16 @@ from card import Card
 from constants import *
 from player import Player
 
-MAX_MOVES = 50
+MAX_MOVES = 20
+MAX_NB_PLAYERS = 6
 
 
 class RNN(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(RNN, self).__init__()
-        self.lstm1 = nn.LSTM(input_size, hidden_size).double()
-        self.lstm2 = nn.LSTM(hidden_size, hidden_size).double()
-        self.fc = nn.Linear(hidden_size, output_size).double()
+        self.lstm1 = nn.LSTM(input_size, hidden_size)
+        self.lstm2 = nn.LSTM(hidden_size, hidden_size)
+        self.fc = nn.Linear(hidden_size, output_size)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -30,10 +31,10 @@ class RNN(nn.Module):
 
     def predict_move(self, state):
         features = state.rnnparams()
-        X = torch.tensor(features, dtype=torch.float64).unsqueeze(0)
+        X = torch.tensor(features, dtype=torch.float32).unsqueeze(0)
         with torch.no_grad():
             lstm_output = self.forward(X)
-            _, predicted = torch.max(lstm_output.data[:3], 1)
+            _, predicted = torch.max(lstm_output.data[:2], 1)
         return predicted, lstm_output
 
 
@@ -96,7 +97,7 @@ def play_game(players):
         hands[i % nbr_players].add(deck[i])
     state = State(nbr_players, hands)
     score = [0 for i in range(nbr_players)]
-    win_score = 256
+    win_score = 512
     moves = 0
     while not state.ended and moves < MAX_MOVES:
         moves += 1
@@ -105,13 +106,23 @@ def play_game(players):
         selected_cards, call = Hand(), None
 
         cur_player = state.turn
+        old_sz = state.mid.size()
         resp = idrep, selected_cards, call
+        was_a_lie = not state.mid.empty() and not state.mid.match()
         if not players[state.turn].response(state, resp):
             state.text = "Invalid play"
             # print(state.text)
-            score[cur_player] -= 5
+            score[cur_player] -= 30
         elif state.mid.last_play != None and state.mid.last_play > 0:
-            score[cur_player] += 5
+            score[cur_player] += 31
+        elif resp == 0:
+            if state.turn == cur_player and old_sz != 0:
+                score[cur_player] += 30
+                score[state.prev_player] -= 3
+            else:
+                score[cur_player] -= 10
+        if was_a_lie and resp != 0:
+            score[cur_player] -= 20
         state.played = False
         state.call = None
         for card in state.cur_selected.cards:
@@ -140,10 +151,10 @@ def genetic_algorithm(
     )
     for generation in range(num_generations):
         fitness_scores = [[i, 0] for i in range(population_size)]
-        for i in range(200):
+        for i in range(100):
             players = [
                 random.randint(0, population_size - 1)
-                for k in range(random.randint(2, 6))
+                for k in range(random.randint(2, MAX_NB_PLAYERS))
             ]
             nb_players = len(players)
             game_players = [Player(6) for i in range(nb_players)]
@@ -158,7 +169,7 @@ def genetic_algorithm(
         print("Generation", generation + 1, "best fitness:", fitness_scores[0][1])
 
         top_performers = [
-            population[i] for i, _ in fitness_scores[: population_size // 2]
+            population[i] for i, _ in fitness_scores[: population_size // 3]
         ]
 
         new_population = top_performers[:]
@@ -174,17 +185,20 @@ def genetic_algorithm(
             new_population.append((child_model, child_genes))
 
         population = new_population
+        if generation % 10 == 9:
+            torch.save(population[0][0].state_dict(), "../data/best_model.pt")
+            print("Saved model")
 
     return population[0][0], population[0][1]
 
 
-input_size = 14
-hidden_size = 20
-output_size = 20
+input_size = 65
+hidden_size = 30
+output_size = 56
 population_size = 50
-mutation_rate = 0.1
-mutation_sigma = 0.1
-num_generations = 20
+mutation_rate = 0.5
+mutation_sigma = 0.5
+num_generations = 100
 
 
 def train_rnn():

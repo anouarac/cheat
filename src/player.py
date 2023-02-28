@@ -1,5 +1,7 @@
+from decimal import Clamped
 import numpy as np
 import torch
+from copy import deepcopy
 from random import randint, shuffle
 from constants import *
 from state import State
@@ -117,55 +119,51 @@ class Player:
         else:
             self.play_random(state)
 
-    def get_num_cards_to_play(self, lstm_output):
+    def get_num_cards_to_play(self, state, lstm_output):
         # get the number of cards to play from the LSTM output
-        num_cards = int(lstm_output[0][0])
+        num_cards = int(lstm_output.data[0][2])
 
-        # make sure the number of cards is within the allowed range
         if num_cards < 1:
             num_cards = 1
-        elif num_cards > self.hands[self.turn].size():
-            num_cards = self.hands[self.turn].size()
+        elif num_cards > state.hands[state.turn].size():
+            num_cards = state.hands[state.turn].size()
 
         return num_cards
 
-    def get_card_indices_to_play(self, lstm_output):
+    def get_cards_to_play(self, state, lstm_output):
         # get the indices of the cards to play from the LSTM output
-        card_indices = []
-        for i in range(len(lstm_output[0][1:])):
+        deck = [Card(c, nb) for nb in range(1, MAX_CARD_VALUE) for c in CARD_SUITS]
+        deck.sort()
+        cards = []
+        num_cards = self.get_num_cards_to_play(state, lstm_output)
+        for i in range(52):
             if (
-                lstm_output[0][1:][i] > 0.5
+                lstm_output.data[0][4:][i] > 0.5
+                and deck[i] in state.hands[state.turn].cards
             ):  # use a threshold of 0.5 to determine which cards to play
-                card_indices.append(i)
+                cards.append(deck[i])
 
-        # make sure at least one card is played
-        if len(card_indices) == 0:
-            card_indices.append(0)
-
-        return card_indices
+        return cards
 
     def choose_card_value(self, output):
-        return int(output[-1][-1])
+        return max(1, min(int(output.data[0][3] * 10), 13))
 
     # 5 RNN
-    def play_rnn(self, state):
+    def play_rnn(self, state, resp):
         predicted, lstm_output = self.model.predict_move(state)
         if predicted == 0:
+            resp = 0
             return state.call_bs()
-        elif predicted == 1:
-            num_cards = self.get_num_cards_to_play(lstm_output)
-            card_indices = self.get_card_indices_to_play(lstm_output)
+        else:
+            resp = 1
+            num_cards = self.get_num_cards_to_play(state, lstm_output)
             card_value = self.choose_card_value(lstm_output)
             if not state.mid.empty():
                 card_value = state.mid.current_value
             player = state.turn
-            cards = [
-                state.hands[player].cards[card_indices[i]] for i in range(num_cards)
-            ]
+            cards = self.get_cards_to_play(state, lstm_output)
+
             return state.play(Hand(cards), card_value)
-        else:
-            self.play_honest(state)
-            return True
 
     def response(self, state, resp=None):
         if self.type == 0:
@@ -181,5 +179,5 @@ class Player:
         elif self.type == 5:  # Q-agent
             return self.play_user(state, resp)
         elif self.type == 6:  # RNN
-            return self.play_rnn(state)
+            return self.play_rnn(state, resp)
         return True
