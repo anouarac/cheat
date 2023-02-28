@@ -1,13 +1,14 @@
 from constants import *
 from card import Card
 
+
 class Hand:
     def __init__(self, cards=None, public=False):
         self.cards = cards
         self.public = public
         if not cards:
             self.cards = []
-    
+
     def set_privacy(self, public):
         self.public = public
 
@@ -25,7 +26,7 @@ class Hand:
             if card in self.cards:
                 available.add(card)
         return available
-    
+
     def cnt_value(self, value):
         cards = self.cards_of_value(value)
         return cards.size()
@@ -43,11 +44,13 @@ class Hand:
     def delete_cards(self, cards):
         for card in cards:
             if not card in self.cards:
+                print(card)
+                print(self.cards)
                 return False
         for card in cards:
             self.delete(card)
         return True
-    
+
     def clear_sets(self):
         counter = [0 for i in range(MAX_CARD_VALUE)]
         for card in self.cards:
@@ -55,12 +58,12 @@ class Hand:
         for i in range(1, MAX_CARD_VALUE):
             if counter[i] == 4:
                 for c in CARD_SUITS:
-                    self.delete(Card(c,i))
-    
+                    self.delete(Card(c, i))
+
     def arrange(self):
         self.cards.sort()
         self.clear_sets()
-    
+
     def sort(self):
         self.cards.sort()
 
@@ -69,17 +72,17 @@ class Hand:
 
     def empty(self):
         return not self.cards
-    
+
     def clear(self):
         self.cards = []
 
     def __str__(self):
         return "[ " + ", ".join([str(card) for card in self.cards]) + " ]"
-    
+
     def __hash__(self):
-        deck = [Card(c,nb) for nb in range(1, MAX_CARD_VALUE) for c in CARD_SUITS]
+        deck = [Card(c, nb) for nb in range(1, MAX_CARD_VALUE) for c in CARD_SUITS]
         deck.sort()
         h = 0
         for card in self.cards:
-            h |= (1 << deck.index(card))
+            h |= 1 << deck.index(card)
         return h
